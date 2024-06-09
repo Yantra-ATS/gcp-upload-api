@@ -15,8 +15,5 @@ public class GcpConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowCredentials(true);
     }
-    @Bean
-    public Storage storage() {
-        return StorageOptions.getDefaultInstance().getService();
-    }
+
 }

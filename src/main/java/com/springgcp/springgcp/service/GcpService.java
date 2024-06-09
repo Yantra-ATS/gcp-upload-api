@@ -1,23 +1,45 @@
 package com.springgcp.springgcp.service;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.StorageException;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.google.cloud.storage.Storage;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class GcpService {
-@Autowired
-Storage storage;
+    private Storage storage;
+
+    @PostConstruct
+    public void init() throws IOException {
+        // Load the credentials from the JSON key file
+        try (FileInputStream serviceAccountStream = new FileInputStream("C:\\Users\\sai\\AppData\\Roaming\\gcloud\\application_default_credentials.json")) {
+            GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountStream);
+
+            // Build the storage object
+            this.storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        }
+    }
+
+    public Storage getStorage() {
+        return storage;
+    }
     public String uploadFileToGCS() throws IOException {
          byte[] excelFile = createExcelFile();
-        System.setProperty("GOOGLE_APPLICATION_CREDENTIALS", "C:\\Users\\sai\\AppData\\Roaming\\gcloud\\application_default_credentials.json");
+       // System.setProperty("GOOGLE_APPLICATION_CREDENTIALS", "C:\\Users\\sai\\AppData\\Roaming\\gcloud\\application_default_credentials.json");
         // Upload the file to Google Cloud Storage
          return uploadObject("sample143", "gcpfilenew23.xlsx", excelFile);
 
